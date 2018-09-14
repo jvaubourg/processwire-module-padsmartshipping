@@ -1,21 +1,21 @@
 <?php namespace ProcessWire;
 
-class PadSmartShippingCountries extends Process Implements WirePageEditor {
+class PadSmartShippingWarehouses extends Process Implements WirePageEditor {
   public static function getModuleInfo() {
     return array(
-      'title' => 'PadSmartShipping - List of Countries with VAT',
+      'title' => 'PadSmartShipping - List of Warehouses with Shipping Methods',
       'version' => 1,
-      'summary' => 'Add an admin menu to define countries with VAT categories for shipping',
+      'summary' => 'Add an admin menu to define warehouses with available shipping methods',
       'icon' => 'cart-plus',
       'href' => 'https://github.com/jvaubourg/processwire-module-padsmartshipping',
       'author' => 'Julien Vaubourg',
       'permission' => 'padloper-admin',
       'permissions' => 'padloper-admin',
-      'requires' => 'PadLoper',
+      'requires' => 'PadSmartShippingCountries',
       'page' => array(
-        'name' => 'padsmartshipping-countries',
+        'name' => 'padsmartshipping-warehouses',
         'parent' => 'setup',
-        'title' => 'SmartShipping Countries',
+        'title' => 'SmartShipping Warehouses',
       ),
     );
   }
@@ -28,27 +28,27 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
     $wrapper = new InputfieldWrapper();
     $wrapper->attr('class', 'ui-helper-clearfix');
 
-    $countries = $this->pages->find("template=padsmartshipping_country");
+    $warehouses = $this->pages->find("template=padsmartshipping_warehouse");
 
-    foreach($countries as $country) {
+    foreach($warehouses as $warehouse) {
       $tab = new InputfieldWrapper();
-      $tab->attr('id', $country->name);
-      $tab->attr('title', $country->title);
+      $tab->attr('id', $warehouse->name);
+      $tab->attr('title', $warehouse->title);
       $tab->attr('class', 'WireTab');
 
       $markup = $this->modules->get('InputfieldMarkup');
-      $markup->label = $country->title;
+      $markup->label = $warehouse->title;
       $markup->icon = 'globe';
 
       $button = $this->modules->get('InputfieldButton');
-      $button->attr('href', "./edit/?id={$country->id}");
-      $button->attr('icon', 'balance-scale');
-      $button->attr('value', $this->_("Edit VAT rates"));
+      $button->attr('href', "./edit/?id={$warehouse->id}");
+      $button->attr('icon', 'truck');
+      $button->attr('value', $this->_("Edit Shipping Methods"));
 
-      if($country->pad_smartshipping_country_vatrates->count) {
+      if($warehouse->pad_smartshipping_warehouse_shippingmethods->count) {
         $table = $this->modules->get('MarkupAdminDataTable');
         $table->setEncodeEntities(false);
-        $fields = $country->pad_smartshipping_country_vatrates->first()->fields;
+        $fields = $warehouse->pad_smartshipping_warehouse_shippingmethods->first()->fields;
         $headerFields = array();
 
         foreach($fields as $field) {
@@ -57,7 +57,7 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
 
         $table->headerRow($headerFields);
 
-        foreach($country->pad_smartshipping_country_vatrates as $ptr) {
+        foreach($warehouse->pad_smartshipping_warehouse_shippingmethods as $ptr) {
           $fieldValues = array();
 
           foreach($ptr->fields as $field) {
@@ -70,8 +70,8 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
         $markup->value .= '<br />' . $table->render();
 
       } else {
-        $button->attr('value', $this->_("Add VAT rates"));
-        $message = $this->_("This country doesn't have VAT rates yet.");
+        $button->attr('value', $this->_("Add Shipping methods"));
+        $message = $this->_("This warehouse doesn't have shopping methods yet.");
         $markup->value .= "<p class='description'>$message</p>";
       }
       
@@ -84,7 +84,7 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
     $button->attr('wrapClass', 'ui-helper-clearfix');
     $button->attr('href', './edit/?id=0');
     $button->attr('icon', 'plus-circle');
-    $button->attr('value', $this->_("Add new Country"));
+    $button->attr('value', $this->_("Add new Warehouse"));
 
     $out = $wrapper->render();
     $out .= '<br />';
@@ -96,21 +96,21 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
   public function executeEdit() {
     $this->breadcrumbs->add(new Breadcrumb('../', $this->page->title));
 
-    $country = $this->pages->get((int) $this->input->get('id'));
+    $warehouse = $this->pages->get((int) $this->input->get('id'));
 
-    if($country->id > 0) {
-      Wire::setFuel('processHeadline', $this->_("Edit Country:") . " {$country->title}");
+    if($warehouse->id > 0) {
+      Wire::setFuel('processHeadline', $this->_("Edit Warehouse:") . " {$warehouse->title}");
 
     } else {
-      Wire::setFuel('processHeadline', $this->_("Add new Country"));
+      Wire::setFuel('processHeadline', $this->_("Add new Warehouse"));
 
-      $country = new Page();
-      $country->template = 'padsmartshipping_country';
-      $country->parent = $this->pages->get('template=admin, name=padsmartshipping-countries');
-      $country->title = $this->_("New country class");
-      $country->save();
+      $warehouse = new Page();
+      $warehouse->template = 'padsmartshipping_warehouse';
+      $warehouse->parent = $this->pages->get('template=admin, name=padsmartshipping-warehouses');
+      $warehouse->title = $this->_("New warehouse class");
+      $warehouse->save();
 
-      $this->session->redirect("./?id={$country->id}");
+      $this->session->redirect("./?id={$warehouse->id}");
     }
 
     $pe = $this->modules->get('ProcessPageEdit');
@@ -159,14 +159,14 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
 
     $this->message("Created templates $template_names");
 
-    $vatrates_pagetable = $this->fields->get("pad_smartshipping_country_vatrates");
-    $vatrates_template = $this->templates->get("padsmartshipping_country_vatrate");
-    $vatrates_pagetable->template_id = $vatrates_template->id;
-    $vatrates_pagetable->save();
+    $shippingmethods_pagetable = $this->fields->get("pad_smartshipping_warehouse_shippingmethods");
+    $shippingmethods_template = $this->templates->get("padsmartshipping_warehouse_shippingmethod");
+    $shippingmethods_pagetable->template_id = $shippingmethods_template->id;
+    $shippingmethods_pagetable->save();
   }
 
   public function uninstall() {
-    $padpages = $this->pages->find("template=padsmartshipping_country_vatrate|padsmartshipping_country|padsmartshipping_countries, include=all");
+    $padpages = $this->pages->find("template=padsmartshipping_warehouse_shippingmethod|padsmartshipping_warehouse|padsmartshipping_warehouses, include=all");
 
     foreach($padpages as $p) {
       if($p->id) $this->pages->delete($p, true);
@@ -194,12 +194,12 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
   }
 
   private function getFieldData() {
-    $fields_json = file_get_contents(__DIR__ . "/data/countries_fields.json");
+    $fields_json = file_get_contents(__DIR__ . "/data/warehouses_fields.json");
     return json_decode($fields_json, true);
   }
 
   private function getTemplateData() {
-    $templates_json = file_get_contents(__DIR__ . "/data/countries_templates.json");
+    $templates_json = file_get_contents(__DIR__ . "/data/warehouses_templates.json");
     return json_decode($templates_json, true);
   }
 }

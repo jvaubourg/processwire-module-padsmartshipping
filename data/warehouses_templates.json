@@ -1,7 +1,7 @@
 {
-    "padsmartshipping_countries": {
-        "name": "padsmartshipping_countries",
-        "fieldgroups_id": "padsmartshipping_countries",
+    "padsmartshipping_warehouse": {
+        "name": "padsmartshipping_warehouse",
+        "fieldgroups_id": "padsmartshipping_warehouse",
         "flags": 0,
         "cache_time": 0,
         "useRoles": 0,
@@ -57,16 +57,24 @@
         "_exportMode": true,
         "fieldgroupFields": [
             "title",
-            "pad_smartshipping_countries_list"
+            "pad_smartshipping_warehouse_country",
+            "pad_smartshipping_warehouse_shippingmethods",
+            "pad_smartshipping_warehouse_virtual",
+            "pad_smartshipping_warehouse_disabled",
+            "pad_smartshipping_warehouse_disableduntil"
         ],
         "fieldgroupContexts": {
             "title": [],
-            "pad_smartshipping_countries_list": []
+            "pad_smartshipping_warehouse_country": [],
+            "pad_smartshipping_warehouse_shippingmethods": [],
+            "pad_smartshipping_warehouse_virtual": [],
+            "pad_smartshipping_warehouse_disabled": [],
+            "pad_smartshipping_warehouse_disableduntil": []
         }
     },
-    "padsmartshipping_country": {
-        "name": "padsmartshipping_country",
-        "fieldgroups_id": "padsmartshipping_country",
+    "padsmartshipping_warehouses": {
+        "name": "padsmartshipping_warehouses",
+        "fieldgroups_id": "padsmartshipping_warehouses",
         "flags": 0,
         "cache_time": 0,
         "useRoles": 0,
@@ -122,18 +130,16 @@
         "_exportMode": true,
         "fieldgroupFields": [
             "title",
-            "pad_smartshipping_country_vatnumber",
-            "pad_smartshipping_country_vatrates"
+            "pad_smartshipping_warehouses_list"
         ],
         "fieldgroupContexts": {
             "title": [],
-            "pad_smartshipping_country_vatnumber": [],
-            "pad_smartshipping_country_vatrates": []
+            "pad_smartshipping_warehouses_list": []
         }
     },
-    "padsmartshipping_country_vatrate": {
-        "name": "padsmartshipping_country_vatrate",
-        "fieldgroups_id": "padsmartshipping_country_vatrate",
+    "padsmartshipping_warehouse_shippingmethod": {
+        "name": "padsmartshipping_warehouse_shippingmethod",
+        "fieldgroups_id": "padsmartshipping_warehouse_shippingmethod",
         "flags": 0,
         "cache_time": 0,
         "useRoles": 0,
@@ -144,7 +150,7 @@
         "noParents": "",
         "childTemplates": [],
         "parentTemplates": [
-            "padsmartshipping_country"
+            "padsmartshipping_warehouse"
         ],
         "allowPageNum": 0,
         "allowChangeUser": 0,
@@ -191,11 +197,29 @@
         "_exportMode": true,
         "fieldgroupFields": [
             "title",
-            "pad_smartshipping_country_vatrate_percentage"
+            "pad_smartshipping_warehouse_shippingmethod_allcountries",
+            "pad_smartshipping_warehouse_shippingmethod_incountries",
+            "pad_smartshipping_warehouse_shippingmethod_excountries",
+            "pad_smartshipping_warehouse_shippingmethod_baseprice",
+            "pad_smartshipping_warehouse_shippingmethod_includedweight",
+            "pad_smartshipping_warehouse_shippingmethod_kgprice",
+            "pad_smartshipping_warehouse_shippingmethod_addminweight",
+            "pad_smartshipping_warehouse_shippingmethod_maxweight",
+            "pad_smartshipping_warehouse_shippingmethod_maxvolume",
+            "pad_smartshipping_warehouse_shippingmethod_minfree"
         ],
         "fieldgroupContexts": {
             "title": [],
-            "pad_smartshipping_country_vatrate_percentage": []
+            "pad_smartshipping_warehouse_shippingmethod_allcountries": [],
+            "pad_smartshipping_warehouse_shippingmethod_incountries": [],
+            "pad_smartshipping_warehouse_shippingmethod_excountries": [],
+            "pad_smartshipping_warehouse_shippingmethod_baseprice": [],
+            "pad_smartshipping_warehouse_shippingmethod_includedweight": [],
+            "pad_smartshipping_warehouse_shippingmethod_kgprice": [],
+            "pad_smartshipping_warehouse_shippingmethod_addminweight": [],
+            "pad_smartshipping_warehouse_shippingmethod_maxweight": [],
+            "pad_smartshipping_warehouse_shippingmethod_maxvolume": [],
+            "pad_smartshipping_warehouse_shippingmethod_minfree": []
         }
     }
 }

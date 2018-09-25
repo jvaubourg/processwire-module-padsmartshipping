@@ -1,0 +1,114 @@
+<?php namespace ProcessWire;
+
+class PadSmartShippingProducts extends WireData implements Module {
+  public static function getModuleInfo() {
+    return array(
+      'title' => 'PadSmartShipping - Stock Product infos',
+      'version' => 1,
+      'summary' => 'Add stock-related fields to the products',
+      'icon' => 'cart-plus',
+      'href' => 'https://github.com/jvaubourg/processwire-module-padsmartshipping',
+      'author' => 'Julien Vaubourg',
+      'permission' => 'padloper-admin',
+      'permissions' => 'padloper-admin',
+      'requires' => [ 'PadSmartShippingCountries', 'PadSmartShippingWarehouses', 'InputfieldTable' ],
+    );
+  }
+
+  // inspired from PadProcessShipping
+  public function install() {
+    $fields = $this->getFieldData();
+    $field_names = '';
+
+    foreach($fields as $field_name => $field_data) {
+      $f = new Field();
+      $f->setImportData($field_data);
+      $f->save();
+      $field_names .= "$field_name ";
+    }
+
+    $this->message("Created fields $field_names");
+
+    $templates = $this->getTemplateData();
+    $template_names = '';
+
+    foreach($templates as $template_name => $template_data) {
+      $fg = new Fieldgroup();
+      $fg->name = $template_name;
+      $template_names .= "$template_name ";
+
+      foreach($template_data['fieldgroupFields'] as $fieldname) {
+        $fg->add($fieldname);
+      }
+
+      $fg->save();
+
+      $t = new Template();
+      $t->setImportData($template_data) ;
+      $t->save();
+    }
+
+    $this->message("Created templates $template_names");
+
+    $stocks_pagetable = $this->fields->get('pad_smartshipping_product_stocks');
+    $stocks_template = $this->templates->get('padsmartshipping_product_stock');
+    $stocks_pagetable->template_id = $stocks_template->id;
+    $stocks_pagetable->save();
+    
+    foreach($this->modules->get('PadCart')->product_templates as $tpl) {
+      $product_tpl = $this->templates->get($tpl);
+      $product_tpl->fields->add($this->fields->get('pad_smartshipping_product_weight'));
+      $product_tpl->fields->add($this->fields->get('pad_smartshipping_product_volume'));
+      $product_tpl->fields->add($this->fields->get('pad_smartshipping_product_stocks'));
+      $product_tpl->fields->save();
+
+      $this->message("Added product fields to the {$product_tpl->name} product template");
+    }
+  }
+
+  public function uninstall() {
+    $padpages = $this->pages->find("template=padsmartshipping_product_stock, include=all");
+
+    foreach($padpages as $p) {
+      if($p->id) $this->pages->delete($p, true);
+    }
+
+    foreach($this->modules->get('PadCart')->product_templates as $tpl) {
+      $product_tpl = $this->templates->get($tpl);
+      $product_tpl->fields->remove($this->fields->get('pad_smartshipping_product_stocks'));
+      $product_tpl->fields->remove($this->fields->get('pad_smartshipping_product_volume'));
+      $product_tpl->fields->remove($this->fields->get('pad_smartshipping_product_weight'));
+      $product_tpl->fields->save();
+    }
+
+    $templates = $this->getTemplateData();
+
+    foreach($templates as $template_name => $template_data) {
+      $t = $this->templates->get($template_name);
+      if($t) $this->templates->delete($t);
+      $fg = $this->fieldgroups->get($template_name);
+      if($fg) $this->fieldgroups->delete($fg);
+    }
+
+    $fields = $this->getFieldData();
+
+    foreach($fields as $field_name => $field_data) {
+      $f = $this->fields->get($field_name);
+      if($f) {
+        $f->flags = Field::flagSystemOverride;
+        $f->flags = 0;
+        $this->fields->delete($f);
+      }
+    }
+  }
+
+  private function getFieldData() {
+    $fields_json = file_get_contents(__DIR__ . "/data/products_fields.json");
+    return json_decode($fields_json, true);
+  }
+
+  private function getTemplateData() {
+    $templates_json = file_get_contents(__DIR__ . "/data/products_templates.json");
+    return json_decode($templates_json, true);
+  }
+}

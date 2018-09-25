@@ -11,7 +11,7 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
       'author' => 'Julien Vaubourg',
       'permission' => 'padloper-admin',
       'permissions' => 'padloper-admin',
-      'requires' => 'PadLoper',
+      'requires' => [ 'PadLoper', 'InputfieldTable' ],
       'page' => array(
         'name' => 'padsmartshipping-countries',
         'parent' => 'setup',
@@ -166,7 +166,7 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
   }
 
   public function uninstall() {
-    $padpages = $this->pages->find("template=padsmartshipping_country_vatrate|padsmartshipping_country|padsmartshipping_countries, include=all");
+    $padpages = $this->pages->find("template=padsmartshipping_country_vatrate|padsmartshipping_country, include=all");
 
     foreach($padpages as $p) {
       if($p->id) $this->pages->delete($p, true);

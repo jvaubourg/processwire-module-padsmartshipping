@@ -1,21 +1,4 @@
 {
-    "pad_smartshipping_countries_list": {
-        "type": "FieldtypePageTable",
-        "flags": 0,
-        "tags": "-padsmartshipping",
-        "name": "pad_smartshipping_countries_list",
-        "nameFormat": "country",
-        "label": "Countries",
-        "columns": "title",
-        "derefAsPage": 0,
-        "allowUnpub": "",
-        "collapsed": 0,
-        "showIf": "",
-        "columnWidth": 100,
-        "required": "",
-        "requiredIf": "",
-        "noclose": 0
-    },
     "pad_smartshipping_country_vatnumber": {
         "type": "FieldtypeText",
         "flags": 0,

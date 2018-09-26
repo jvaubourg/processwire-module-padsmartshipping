@@ -57,10 +57,23 @@ class PadSmartShippingProducts extends WireData implements Module {
     
     foreach($this->modules->get('PadCart')->product_templates as $tpl) {
       $product_tpl = $this->templates->get($tpl);
+
       $product_tpl->fields->add($this->fields->get('pad_smartshipping_product_weight'));
       $product_tpl->fields->add($this->fields->get('pad_smartshipping_product_volume'));
       $product_tpl->fields->add($this->fields->get('pad_smartshipping_product_stocks'));
       $product_tpl->fields->save();
+
+      // ref to the PadOpt module here
+      if($product_tpl->name == 'product') {
+        $product_fg = $this->fieldgroups->get($product_tpl->name);
+
+        $product_fg->setFieldContextArray($product_fg->getField('variations', true)->id, [ 'requiredIf' => 'padopt_tpl_id=""', 'showIf' => 'padopt_tpl_id=""' ]);
+        $product_fg->setFieldContextArray($product_fg->getField('pad_smartshipping_product_weight', true)->id, [ 'requiredIf' => "padopt_tpl_id=''", 'showIf' => "padopt_tpl_id=''" ]);
+        $product_fg->setFieldContextArray($product_fg->getField('pad_smartshipping_product_volume', true)->id, [ 'requiredIf' => "padopt_tpl_id=''", 'showIf' => "padopt_tpl_id=''" ]);
+        $product_fg->setFieldContextArray($product_fg->getField('pad_smartshipping_product_stocks', true)->id, [ 'requiredIf' => "padopt_tpl_id=''", 'showIf' => "padopt_tpl_id=''" ]);
+
+        $product_fg->saveContext();
+      }
 
       $this->message("Added product fields to the {$product_tpl->name} product template");
     }
@@ -75,6 +88,14 @@ class PadSmartShippingProducts extends WireData implements Module {
 
     foreach($this->modules->get('PadCart')->product_templates as $tpl) {
       $product_tpl = $this->templates->get($tpl);
+
+      // ref to the PadOpt module here
+      if($product_tpl->name == 'product') {
+        $product_fg = $this->fieldgroups->get($product_tpl->name);
+        $product_fg->setFieldContextArray($product_fg->getField('variations', true)->id, []);
+        $product_fg->saveContext();
+      }
+
       $product_tpl->fields->remove($this->fields->get('pad_smartshipping_product_stocks'));
       $product_tpl->fields->remove($this->fields->get('pad_smartshipping_product_volume'));
       $product_tpl->fields->remove($this->fields->get('pad_smartshipping_product_weight'));

@@ -1,0 +1,89 @@
+<?php namespace ProcessWire;
+
+class PadSmartShippingSite extends WireData implements Module {
+  public static function getModuleInfo() {
+    return array(
+      'title' => 'PadSmartShipping - Site-side fields',
+      'version' => 1,
+      'summary' => 'Provide public site-side fields and other HTML elements for the shipping',
+      'icon' => 'cart-plus',
+      'href' => 'https://github.com/jvaubourg/processwire-module-padsmartshipping',
+      'author' => 'Julien Vaubourg',
+      'singular' => true,
+      'autoload' => true,
+      'requires' => [ 'PadSmartShippingCountries', 'PadSmartShippingWarehouses', 'PadSmartShippingProducts' ],
+    );
+  }
+
+  public function init() {
+    $this->session_id = session_id();
+
+    $this->addHookAfter('Page::render', $this, 'addScriptsAndStyles');
+  }
+
+  /**
+   * Add some JS and css in the header of every public page
+   * Act before Page::render
+   */
+  public function addScriptsAndStyles($event) {
+    $page = $event->object; 
+    $module_url = $this->config->urls->siteModules . basename(__DIR__);
+    $root_url = $_SERVER['DOCUMENT_ROOT'];
+
+    $scripts = '';
+    $styles = '';
+
+    if($page->template->name != 'admin') {
+      // Load JS/CSS modules
+      $this->modules->get('JqueryCore')->use('cookie');
+
+      // Integrate JS scripts from the previous modules
+      foreach($this->config->scripts as $script) {
+        if(preg_match('/JqueryCore/', $script)) {
+          $scripts .= "<script type='text/javascript' src='{$script}'></script>";
+        }
+      }
+
+      $scripts .= "{$log_script}<script type='text/javascript' src='{$module_url}/templates/scripts/padsmartshipping_site.js'></script>";
+      $styles .= "<link rel='stylesheet' type='text/css' href='{$module_url}/templates/styles/padsmartshipping_site.css' />";
+
+      // Add user defined scripts
+      if(is_file("{$root_url}{$this->config->urls->templates}/scripts/padsmartshipping/padsmartshipping_site.js")) {
+        $scripts .= "<script type='text/javascript' src='{$this->config->urls->templates}/scripts/padsmartshipping/padsmartshipping_site.js'></script>";
+      }
+  
+      // Add user defined styles
+      if(is_file("{$root_url}{$this->config->urls->templates}/styles/padsmartshipping/padsmartshipping_site.css")) {
+        $styles .= "<link type='text/css' href='{$this->config->urls->templates}/styles/padsmartshipping/padsmartshipping_site.css' rel='stylesheet' />";
+      }
+    }
+
+    if(!empty($styles.$scripts)) {
+      $event->return = str_replace('</head>', "{$styles}{$scripts}</head>", $event->return); 
+    }
+  }
+
+  public function getPermanentCustomerInfoFields() {
+    $select_country = '<label>' . __("Shipping in:") . ' <select id="padsmartshipping_site_country" name="padsmartshipping_site_country">';
+
+    foreach($this->getCountriesList() as $iso => $name) {
+      $select_country .= "<option value='$iso'>$name</option>";
+    }
+
+    $select_country .= '</select></label>';
+    $select_b2b = '<label>' . __("B2B:") . ' <input type="checkbox" id="padsmartshipping_site_b2b" name="padsmartshipping_site_b2b" value="1" /></label>';
+
+    return "$select_country $select_b2b";
+  }
+
+  public function getCountriesList() {
+    include(__DIR__ . '/data/countries_list.php');
+    return $countries_list;
+  }
+
+  public function install() {
+  }
+
+  public function uninstall() {
+  }
+}

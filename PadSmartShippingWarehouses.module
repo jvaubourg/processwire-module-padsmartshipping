@@ -122,6 +122,11 @@ class PadSmartShippingWarehouses extends Process Implements WirePageEditor {
     return $this->page;
   }
 
+  public function getCountriesList() {
+    include(__DIR__ . "/data/countries_list.php");
+    return $countries_list;
+  }
+
   // inspired from PadProcessShipping
   public function install() {
     parent::install();
@@ -131,10 +136,29 @@ class PadSmartShippingWarehouses extends Process Implements WirePageEditor {
 
     foreach($fields as $field_name => $field_data) {
       $f = new Field();
+
       $f->setImportData($field_data);
       $f->save();
       $field_names .= "$field_name ";
     }
+
+    $countries_list = array_keys($this->getCountriesList());
+
+    $countries_values = array('0=WORLD', '1=EUROPE');
+    for($i = 0; $i < count($countries_list); $i++) {
+      $countries_values[] = ($i + 3) . "=${countries_list[$i]}";
+    }
+
+    $field = $this->fields->get('pad_smartshipping_warehouse_shippingmethod_incountries');
+    $this->modules->get('FieldtypeOptions')->manager->setOptionsString($field, implode("\n", $countries_values), true);
+
+    $countries_values = array();
+    for($i = 0; $i < count($countries_list); $i++) {
+      $countries_values[] = ($i + 1) . "=${countries_list[$i]}";
+    }
+
+    $field = $this->fields->get('pad_smartshipping_warehouse_shippingmethod_excountries');
+    $this->modules->get('FieldtypeOptions')->manager->setOptionsString($field, implode("\n", $countries_values), true);
 
     $this->message("Created fields $field_names");
 

@@ -57,11 +57,13 @@
         "_exportMode": true,
         "fieldgroupFields": [
             "title",
+            "pad_smartshipping_country_code",
             "pad_smartshipping_country_vatnumber",
             "pad_smartshipping_country_vatrates"
         ],
         "fieldgroupContexts": {
             "title": [],
+            "pad_smartshipping_country_code": [],
             "pad_smartshipping_country_vatnumber": [],
             "pad_smartshipping_country_vatrates": []
         }

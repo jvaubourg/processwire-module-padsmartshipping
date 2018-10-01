@@ -132,9 +132,7 @@
         "_exportMode": true,
         "fieldgroupFields": [
             "title",
-            "pad_smartshipping_warehouse_shippingmethod_allcountries",
-            "pad_smartshipping_warehouse_shippingmethod_incountries",
-            "pad_smartshipping_warehouse_shippingmethod_excountries",
+            "pad_smartshipping_warehouse_shippingmethod_countries",
             "pad_smartshipping_warehouse_shippingmethod_baseprice",
             "pad_smartshipping_warehouse_shippingmethod_includedweight",
             "pad_smartshipping_warehouse_shippingmethod_kgprice",
@@ -145,9 +143,7 @@
         ],
         "fieldgroupContexts": {
             "title": [],
-            "pad_smartshipping_warehouse_shippingmethod_allcountries": [],
-            "pad_smartshipping_warehouse_shippingmethod_incountries": [],
-            "pad_smartshipping_warehouse_shippingmethod_excountries": [],
+            "pad_smartshipping_warehouse_shippingmethod_countries": [],
             "pad_smartshipping_warehouse_shippingmethod_baseprice": [],
             "pad_smartshipping_warehouse_shippingmethod_includedweight": [],
             "pad_smartshipping_warehouse_shippingmethod_kgprice": [],

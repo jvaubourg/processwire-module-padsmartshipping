@@ -1,4 +1,26 @@
 {
+    "pad_smartshipping_country_code": {
+        "type": "FieldtypeText",
+        "flags": 0,
+        "tags": "-padsmartshipping",
+        "name": "pad_smartshipping_country_code",
+        "label": "Country code",
+        "collapsed": 0,
+        "minlength": 0,
+        "maxlength": 2,
+        "showCount": 0,
+        "size": 0,
+        "textformatters": "",
+        "showIf": "",
+        "columnWidth": 100,
+        "required": 1,
+        "description": "eg. DE",
+        "requiredAttr": "",
+        "requiredIf": "",
+        "stripTags": "",
+        "placeholder": "",
+        "pattern": ""
+    },
     "pad_smartshipping_country_vatnumber": {
         "type": "FieldtypeText",
         "flags": 0,

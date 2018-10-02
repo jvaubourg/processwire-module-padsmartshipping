@@ -15,10 +15,63 @@ class PadSmartShippingProducts extends WireData implements Module {
     );
   }
 
+  public function calculateVat($product_price, $warehouse_country, $vatrate, $dst_country_code) {
+//    $warehouse_country_code = $warehouse_country->pad_smartshipping_country_code;
+//
+//    if($warehouse_country_code == 'DE') {
+//      $warehouse_in_dst_country = $this->pages->get("template=padsmartshipping_country, code=${dst_country_code}");
+//
+//      if($warehouse_in_dst_country instanceof NullPage) {
+//        $vat_percentage = 
+//        return $product_price * ($vat_percentage / 100);
+//
+//      } else {
+//        return $product_price * ($vatrate / 100);
+//      }
+//    } else {
+//
+//    }
+  }
+
+  public function getPriceWithVat($product, $dst_country_code) {
+    $pricefield = $event->object->pricefield;
+    $product_price = $product->$pricefield;
+
+    $stocks = $this->pages->find("template=padsmartshipping_product_stock, parent=${product}");
+
+    foreach($stocks as $stock) {
+      $warehouse = $stock->pad_smartshipping_product_stock_warehouse;
+      $vatrate = $stock->pad_smartshipping_product_stock_vatrate;
+      $warehouse_country = $warehouse->pad_smartshipping_warehouse_country;
+
+      if($warehouse_country->pad_smartshipping_country_code == $dst_country_code) {
+        return $product_price + $this->calculateVat($product_price, $warehouse_country, $vatrate, $dst_country_code);
+      }
+
+      $warehouse_shippingmethods = $warehouse->pad_smartshipping_warehouse_shippingmethods;
+      $warehouse_shippingmethod = $warehouse_shippingmethods->get("pad_smartshipping_warehouse_shippingmethod_countries*=${dst_country_code}");
+
+      if(!($warehouse_shippingmethod instanceof NullPage)) {
+        return $product_price + $this->calculateVat($product_price, $warehouse_country, $vatrate, $dst_country_code);
+      }
+    }
+
+    return -1;
+  }
+
   // inspired from PadProcessShipping
   public function install() {
     $fields = $this->getFieldData();
     $field_names = '';
+
+    $vatrates_country_template = $this->templates->get('padsmartshipping_country');
+    $fields['pad_smartshipping_product_vatrates']['col1selector'] = 'template=' . $vatrates_country_template->id;
+
+    $vatrates_category_list = file_get_contents(__DIR__ . '/data/vatrates_list.txt');
+    $fields['pad_smartshipping_product_vatrates']['col2options'] = $vatrates_category_list;
+
+    $stocks_warehouse_template = $this->templates->get('padsmartshipping_warehouse');
+    $fields['pad_smartshipping_product_stocks']['col1selector'] = 'template=' . $stocks_warehouse_template->id;
 
     foreach($fields as $field_name => $field_data) {
       $f = new Field();
@@ -50,11 +103,6 @@ class PadSmartShippingProducts extends WireData implements Module {
 
     $this->message("Created templates $template_names");
 
-    $stocks_pagetable = $this->fields->get('pad_smartshipping_product_stocks');
-    $stocks_template = $this->templates->get('padsmartshipping_product_stock');
-    $stocks_pagetable->template_id = $stocks_template->id;
-    $stocks_pagetable->save();
-    
     foreach($this->modules->get('PadCart')->product_templates as $tpl) {
       $product_tpl = $this->templates->get($tpl);
 
@@ -67,10 +115,13 @@ class PadSmartShippingProducts extends WireData implements Module {
       if($product_tpl->name == 'product') {
         $product_fg = $this->fieldgroups->get($product_tpl->name);
 
+        $product_tpl->fields->add($this->fields->get('pad_smartshipping_product_vatrates'));
+        $product_tpl->fields->save();
+
         $product_fg->setFieldContextArray($product_fg->getField('variations', true)->id, [ 'requiredIf' => 'padopt_tpl_id=""', 'showIf' => 'padopt_tpl_id=""' ]);
-        $product_fg->setFieldContextArray($product_fg->getField('pad_smartshipping_product_weight', true)->id, [ 'requiredIf' => "padopt_tpl_id=''", 'showIf' => "padopt_tpl_id=''" ]);
-        $product_fg->setFieldContextArray($product_fg->getField('pad_smartshipping_product_volume', true)->id, [ 'requiredIf' => "padopt_tpl_id=''", 'showIf' => "padopt_tpl_id=''" ]);
-        $product_fg->setFieldContextArray($product_fg->getField('pad_smartshipping_product_stocks', true)->id, [ 'requiredIf' => "padopt_tpl_id=''", 'showIf' => "padopt_tpl_id=''" ]);
+        $product_fg->setFieldContextArray($product_fg->getField('pad_smartshipping_product_weight', true)->id, [ 'requiredIf' => "padopt_tpl_id!=''", 'showIf' => "padopt_tpl_id!=''" ]);
+        $product_fg->setFieldContextArray($product_fg->getField('pad_smartshipping_product_volume', true)->id, [ 'requiredIf' => "padopt_tpl_id!=''", 'showIf' => "padopt_tpl_id!=''" ]);
+        $product_fg->setFieldContextArray($product_fg->getField('pad_smartshipping_product_stocks', true)->id, [ 'requiredIf' => "padopt_tpl_id!=''", 'showIf' => "padopt_tpl_id!=''" ]);
 
         $product_fg->saveContext();
       }
@@ -80,17 +131,19 @@ class PadSmartShippingProducts extends WireData implements Module {
   }
 
   public function uninstall() {
-    $padpages = $this->pages->find("template=padsmartshipping_product_stock, include=all");
-
-    foreach($padpages as $p) {
-      if($p->id) $this->pages->delete($p, true);
-    }
+//    $padpages = $this->pages->find("template=padsmartshipping_product_stock, include=all");
+//
+//    foreach($padpages as $p) {
+//      if($p->id) $this->pages->delete($p, true);
+//    }
 
     foreach($this->modules->get('PadCart')->product_templates as $tpl) {
       $product_tpl = $this->templates->get($tpl);
 
       // ref to the PadOpt module here
       if($product_tpl->name == 'product') {
+        $product_tpl->fields->remove($this->fields->get('pad_smartshipping_product_vatrates'));
+
         $product_fg = $this->fieldgroups->get($product_tpl->name);
         $product_fg->setFieldContextArray($product_fg->getField('variations', true)->id, []);
         $product_fg->saveContext();

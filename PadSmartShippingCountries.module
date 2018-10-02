@@ -129,6 +129,24 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
     $fields = $this->getFieldData();
     $field_names = '';
 
+    $templates = $this->getTemplateData();
+    $template_names = '';
+
+    $vatrates_category_list = file(__DIR__ . '/data/vatrates_list.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+    foreach($vatrates_category_list as $vatrate_category) {
+      $vatrate_category_field = $fields['pad_smartshipping_country_vatrate_xxx'];
+      $vatrate_category_id = strtolower(preg_replace('/\s+/', '', $vatrate_category));
+      $vatrate_category_field['name'] = str_replace('xxx', $vatrate_category_id, $vatrate_category_field['name']);
+      $vatrate_category_field['label'] = str_replace('xxx', $vatrate_category, $vatrate_category_field['label']);
+
+      $fields[$vatrate_category_field['name']] = $vatrate_category_field;
+      $templates['padsmartshipping_country']['fieldgroupFields'][] = $vatrate_category_field['name'];
+      $templates['padsmartshipping_country']['fieldgroupContexts'][$vatrate_category_field['name']] = [];
+    }
+
+    unset($fields['pad_smartshipping_country_vatrate_xxx']);
+
     foreach($fields as $field_name => $field_data) {
       $f = new Field();
       $f->setImportData($field_data);
@@ -137,9 +155,6 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
     }
 
     $this->message("Created fields $field_names");
-
-    $templates = $this->getTemplateData();
-    $template_names = '';
 
     foreach($templates as $template_name => $template_data) {
       $fg = new Fieldgroup();
@@ -158,15 +173,10 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
     }
 
     $this->message("Created templates $template_names");
-
-    $vatrates_pagetable = $this->fields->get("pad_smartshipping_country_vatrates");
-    $vatrates_template = $this->templates->get("padsmartshipping_country_vatrate");
-    $vatrates_pagetable->template_id = $vatrates_template->id;
-    $vatrates_pagetable->save();
   }
 
   public function uninstall() {
-    $padpages = $this->pages->find("template=padsmartshipping_country_vatrate|padsmartshipping_country, include=all");
+    $padpages = $this->pages->find("template=padsmartshipping_country, include=all");
 
     foreach($padpages as $p) {
       if($p->id) $this->pages->delete($p, true);
@@ -182,6 +192,14 @@ class PadSmartShippingCountries extends Process Implements WirePageEditor {
     }
 
     $fields = $this->getFieldData();
+    $vatrates_category_list = file(__DIR__ . '/data/vatrates_list.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    unset($fields['pad_smartshipping_country_vatrate_xxx']);
+
+    foreach($vatrates_category_list as $vatrate_category) {
+      $vatrate_category_id = strtolower(preg_replace('/\s+/', '', $vatrate_category));
+      $vatrate_category_fieldname = "pad_smartshipping_country_vatrate_${vatrate_category_id}";
+      $fields[$vatrate_category_fieldname] = '';
+    }
 
     foreach($fields as $field_name => $field_data) {
       $f = $this->fields->get($field_name);

@@ -58,81 +58,12 @@
         "fieldgroupFields": [
             "title",
             "pad_smartshipping_country_code",
-            "pad_smartshipping_country_vatnumber",
-            "pad_smartshipping_country_vatrates"
+            "pad_smartshipping_country_vatnumber"
         ],
         "fieldgroupContexts": {
             "title": [],
             "pad_smartshipping_country_code": [],
-            "pad_smartshipping_country_vatnumber": [],
-            "pad_smartshipping_country_vatrates": []
-        }
-    },
-    "padsmartshipping_country_vatrate": {
-        "name": "padsmartshipping_country_vatrate",
-        "fieldgroups_id": "padsmartshipping_country_vatrate",
-        "flags": 0,
-        "cache_time": 0,
-        "useRoles": 0,
-        "noInherit": 0,
-        "childrenTemplatesID": 0,
-        "sortfield": "",
-        "noChildren": "",
-        "noParents": "",
-        "childTemplates": [],
-        "parentTemplates": [
-            "padsmartshipping_country"
-        ],
-        "allowPageNum": 0,
-        "allowChangeUser": 0,
-        "redirectLogin": 0,
-        "urlSegments": 0,
-        "https": 0,
-        "slashUrls": 1,
-        "slashPageNum": 0,
-        "slashUrlSegments": 0,
-        "altFilename": "",
-        "guestSearchable": 0,
-        "pageClass": "",
-        "childNameFormat": "",
-        "pageLabelField": "",
-        "noGlobal": 1,
-        "noMove": 0,
-        "noTrash": 0,
-        "noSettings": 0,
-        "noChangeTemplate": 0,
-        "noShortcut": 0,
-        "noUnpublish": 0,
-        "noLang": 0,
-        "compile": 3,
-        "nameContentTab": 0,
-        "noCacheGetVars": "",
-        "noCachePostVars": "",
-        "useCacheForUsers": 0,
-        "cacheExpire": 0,
-        "cacheExpirePages": [],
-        "cacheExpireSelector": "",
-        "label": "",
-        "tags": "-padsmartshipping",
-        "titleNames": 0,
-        "noPrependTemplateFile": 0,
-        "noAppendTemplateFile": 0,
-        "prependFile": "",
-        "appendFile": "",
-        "tabContent": "",
-        "tabChildren": "",
-        "nameLabel": "",
-        "contentType": "",
-        "errorAction": 0,
-        "ns": "",
-        "_exportMode": true,
-        "fieldgroupFields": [
-            "title",
-            "pad_smartshipping_country_vatrate_percentage"
-        ],
-        "fieldgroupContexts": {
-            "title": [],
-            "pad_smartshipping_country_vatrate_percentage": []
+            "pad_smartshipping_country_vatnumber": []
         }
     }
 }

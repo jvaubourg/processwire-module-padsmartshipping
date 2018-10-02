@@ -19,6 +19,15 @@ class PadSmartShippingSite extends WireData implements Module {
     $this->session_id = session_id();
 
     $this->addHookAfter('Page::render', $this, 'addScriptsAndStyles');
+    $this->addHookAfter('PadCart::getProductPrice', $this, 'addVatToPrices');
+  }
+
+  public function addVatToPrices($event) {
+    $product = $event->arguments('product');
+    $pricefield = $event->object->pricefield;
+    $ht_price = (float) $product->$pricefield;
+
+//    $vat_price = ;
   }
 
   /**
